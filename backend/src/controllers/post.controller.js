@@ -60,6 +60,114 @@ async function getPosts(req,res){
 
 }
 
+const toggleLike= async (req,res)=>{
+    try{
+        const {id:postId}=req.params;
+        const userId=req.user._id;
+
+        const post=await Post.findById(postId);
+        if(!post){
+            return res.status(404).json({
+                message:"Post not found"
+            })
+        }
+
+        const alreadyLiked=post.likes.some( (id)=> id.toString()===userId.toString());
+
+        if(alreadyLiked){
+            post.likes.pull(userId);
+        }else{
+            post.likes.push(userId);
+        }
+
+        await post.save();
+
+        res.status(200).json({
+            success:true,
+            liked:!alreadyLiked,
+            likesCount:post.likes.length
+        })
+
+    }catch(err){
+        console.log("Error in toggleLike controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+const toggleSavePost= async(req,res)=>{
+    try{
+        const {id:postId}=req.params;
+        const userId=req.user._id;
+
+        const post=await Post.findById(postId);
+
+        if(!post){
+            return res.status(404).json({
+                message:"Post not found"
+            })
+        }
+
+        const user=await User.findById(userId);
+
+        const alreadySaved=user.savedPosts.some( (id)=> id.toString()===postId.toString());
+
+        if(alreadySaved){
+            user.savedPosts.pull(postId);
+        }else{
+            user.savedPosts.push(postId);
+        }
+        await user.save();
+
+        res.status(200).json({
+            success:true,
+            saved:!alreadySaved,
+            savedPostsCount:user.savedPosts.length
+        })
+
+    }
+    catch(err){ 
+        console.log("Error in toggleSavePost controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+const getSavedPosts=async(req,res)=>{
+    try{
+        const userId=req.user._id;
+
+        const user=await User.findById(userId).populate({
+            path:"savedPosts",
+            populate:{
+                path:"author",
+                select:"fullName username profilePic"
+            }
+        });
+
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            })
+        }
+
+        res.status(200).json({
+            success:true,
+            posts:user.savedPosts
+        })
 
 
-export {createPost,getPosts}
+
+    }
+    catch(err){
+        console.log("Error in getSavedPosts controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+
+}
+
+export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts};
