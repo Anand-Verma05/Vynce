@@ -194,3 +194,23 @@ export async function getOutgoingFriendReqs(req,res){
 
 
 }
+
+export async function getUserProfile(req,res){
+    try{
+        const {username}=req.params;
+        const user=await User.findOne({username}).select("-password").populate("friends","fullName username profilePic bio location");
+
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            })
+        }
+
+        res.status(200).json({success:true,user})
+    }catch(err){
+        console.log("Error in getUserProfile controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}

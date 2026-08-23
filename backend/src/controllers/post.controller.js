@@ -312,4 +312,25 @@ const deleteCommnet=async(req,res)=>{
     }
 }
 
-export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet};
+const getUserPosts= async(req,res)=>{
+    try{
+        const {userId}=req.params;
+
+        const posts=await Post.find({
+            author:userId
+        }).populate("author","fullName username profilePic").sort({createdAt:-1});
+        res.status(200).json({
+            success:true,
+            posts
+        })
+
+    }
+    catch(err){
+        console.log("Error in getUserPosts controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts};
