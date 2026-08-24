@@ -1,8 +1,8 @@
 import express from "express";
 
 import {protectRoute} from "../middleware/auth.middleware.js";
-import {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts} from "../controllers/post.controller.js";
-
+import {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts,uploadMedia} from "../controllers/post.controller.js";
+import upload from "../middleware/upload.middleware.js";
 const router=express.Router();
 
 router.use(protectRoute);
@@ -10,6 +10,7 @@ router.use(protectRoute);
 router.post("/",createPost);
 router.get("/",getPosts);
 router.get("/saved",getSavedPosts);
+router.post("/upload",upload.single("media"),uploadMedia);
 router.post("/:id/like",toggleLike);
 router.post("/:id/save",toggleSavePost);
 router.post("/:id/comments",createComment);

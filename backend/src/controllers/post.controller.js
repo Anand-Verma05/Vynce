@@ -1,6 +1,7 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
+import cloudinary from "../lib/cloudinary.js";
 
 async function createPost(req,res){
     try{
@@ -8,13 +9,13 @@ async function createPost(req,res){
 
         if(!mediaUrl || !mediaType){
             return res.status(400).json({
-                message:"mediaUrl and mediaType are required"
+                message:"media is required"
             })
         }
 
         if(!["image","video"].includes(mediaType)){
             return res.status(400).json({
-                message:"mediaType must be either image or video"
+                message:"only image or videos are allowed"
             })
         }
 
@@ -338,4 +339,48 @@ const getUserPosts= async(req,res)=>{
     }
 }
 
-export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts};
+const uploadMedia=async (req,res)=>{
+    try{
+        if(!req.file){
+            return res.status(400).json({
+                message:"No file uploaded"
+            })
+        }
+
+        const fileBuffer=req.file.buffer;
+
+        const result=await new Promise((resolve,reject)=>{
+            const uploadStream=cloudinary.uploader.upload_stream({
+                resource_type:"auto",
+                folder:"social-media",
+            },
+            (error,result)=>{
+                if(error){
+                    reject(error);
+                }else{
+                    resolve(result);
+                }
+            }
+            );
+
+            uploadStream.end(fileBuffer);
+        
+        })
+
+        res.status(200).json({
+            success:true,
+            mediaUrl:result.secure_url,
+            mediaType:result.resource_type
+        })
+
+    }
+
+    catch(err){
+        console.log("Error in uploadMedia controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts,uploadMedia};
