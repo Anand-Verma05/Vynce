@@ -28,7 +28,7 @@ async function createPost(req,res){
 
         })
 
-        const populatedPost=post.populate("author","fullName username profilePic ");
+        const populatedPost=await post.populate("author","fullName username profilePic ");
         res.status(201).json({
             success:true,
             post:populatedPost
@@ -46,15 +46,20 @@ async function createPost(req,res){
 async function getPosts(req,res){
     try{
         const user=req.user;
-        const userIds=[...user.friends];
+        const userIds=[...user.friends, user._id];
 
         const posts=await Post.find({
             author:{$in:userIds },
         }).populate("author","fullName username profilePic").sort({createdAt:-1});
 
+        const postsWithCommentCounts=await Promise.all(posts.map(async (post)=>{
+            const commentsCount=await Comment.countDocuments({post:post._id});
+            return {...post.toObject(),commentsCount};
+        }));
+
         res.status(200).json({
             success:true,
-            posts
+            posts:postsWithCommentCounts
         })
     
     }
@@ -160,9 +165,14 @@ const getSavedPosts=async(req,res)=>{
             })
         }
 
+        const postsWithCommentCounts=await Promise.all(user.savedPosts.map(async (post)=>({
+            ...post.toObject(),
+            commentsCount:await Comment.countDocuments({post:post._id})
+        })));
+
         res.status(200).json({
             success:true,
-            posts:user.savedPosts
+            posts:postsWithCommentCounts
         })
 
 
@@ -234,7 +244,8 @@ const getPostComments= async (req,res)=>{
 
         res.status(200).json({
             success:true,
-            comments
+            comments,
+            commentsCount:comments.length
         })
     }
     catch(err){

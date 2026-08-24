@@ -3,14 +3,14 @@ import FriendRequest from "../models/FriendRequest.js"
 export async function getRecommendedUsers(req,res){
 
     try{
-        const currentUserId=req.user.id;
+        const currentUserId=req.user._id;
         const currentUser=req.user;
 
         const recommendedUsers=await User.find({
             $and:[
                 {_id:{$ne:currentUserId}},
                 {_id:{$nin:currentUser.friends}},
-                {isOnboarded:true}
+            
             ]
 
 
