@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
 import {Link} from "react-router-dom"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios";
 import { signup } from "../lib/api";
 const SignUpPage = () => {
   const [signupData, setSignupData] = useState({
     fullName: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -26,10 +26,10 @@ const SignUpPage = () => {
       className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 "
       data-theme="forest"
     >
-      <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-5xl mx-auto bg-base-100 rounded-xl shadow-lg overflow-hidden">
+      <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-6xl mx-auto bg-base-100 rounded-3xl shadow-2xl overflow-hidden">
         {/* //left side */}
 
-        <div className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col">
+        <div className="w-full lg:w-1/2 p-5 sm:p-10 flex flex-col">
           <div className="mb-4 flex items-center justify-start gap-2">
             <ShipWheelIcon className="size-9 text-primary" />
             <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-wider">
@@ -72,6 +72,14 @@ const SignUpPage = () => {
                       required
                     />
                   </div>
+                  {/* USERNAME */}
+                  <div className="form-control w-full">
+                    <label className="label"><span className="label-text">Username</span></label>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <span className="opacity-50">@</span>
+                      <input type="text" placeholder="yourname" className="grow" value={signupData.username} onChange={(e) => setSignupData({ ...signupData, username: e.target.value.toLowerCase().replace(/\s/g, "") })} required minLength={3} />
+                    </label>
+                  </div>
                     {/* EMAIL */}
                   <div className="form-control w-full">
                     <label className="label">
@@ -93,11 +101,12 @@ const SignUpPage = () => {
                     </label>
                     <input
                       type="password"
-                      placeholder="********"
+                      placeholder="At least 6 characters"
                       className="input input-bordered w-full"
                       value={signupData.password}
                       onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                       required
+                      minLength={6}
                     />
                     <p className="text-xs opacity-70 mt-1">
                       Password must be at least 6 characters long

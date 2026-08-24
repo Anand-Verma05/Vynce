@@ -1,0 +1,17 @@
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Camera, MapPin, Save, UserRound } from "lucide-react";
+import toast from "react-hot-toast";
+import { updateProfile } from "../lib/api";
+import useAuthUser from "../hooks/useAuthUser";
+
+const ProfilePage = () => {
+  const { authUser } = useAuthUser(); const client = useQueryClient();
+  const [form, setForm] = useState({ fullName: "", bio: "", profilePic: "", location: "" });
+  // The auth query resolves after the page mounts; hydrate the editable draft once it does.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { if (authUser) setForm({ fullName: authUser.fullName || "", bio: authUser.bio || "", profilePic: authUser.profilePic || "", location: authUser.location || "" }); }, [authUser]);
+  const mutation = useMutation({ mutationFn: updateProfile, onSuccess: () => { client.invalidateQueries({ queryKey: ["authUser"] }); toast.success("Profile updated"); }, onError: (e) => toast.error(e.response?.data?.message || "Could not update profile") });
+  const change = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+  return <div className="min-h-full bg-base-200/40 px-4 py-6 sm:px-8"><div className="mx-auto max-w-3xl"><div className="mb-7"><p className="text-sm font-semibold text-primary">YOUR SPACE</p><h1 className="text-3xl font-black">Profile settings</h1><p className="mt-1 opacity-65">Tell the community a little more about yourself.</p></div><div className="card overflow-hidden border border-base-300 bg-base-100 shadow-sm"><div className="h-32 bg-gradient-to-r from-primary/80 via-secondary/60 to-accent/70" /><div className="card-body -mt-14 p-6"><div className="avatar mb-5"><div className="w-28 rounded-full border-4 border-base-100 bg-base-300"><img src={form.profilePic || "/avatar.png"} alt="Profile" /></div></div><form onSubmit={(e) => { e.preventDefault(); mutation.mutate(form); }} className="space-y-5"><label className="form-control"><span className="label-text mb-2 font-semibold">Profile picture URL</span><div className="input input-bordered flex items-center gap-2"><Camera size={17} className="opacity-50" /><input value={form.profilePic} onChange={change("profilePic")} placeholder="https://..." className="grow" /></div></label><label className="form-control"><span className="label-text mb-2 font-semibold">Full name</span><div className="input input-bordered flex items-center gap-2"><UserRound size={17} className="opacity-50" /><input value={form.fullName} onChange={change("fullName")} required className="grow" /></div></label><label className="form-control"><span className="label-text mb-2 font-semibold">Location</span><div className="input input-bordered flex items-center gap-2"><MapPin size={17} className="opacity-50" /><input value={form.location} onChange={change("location")} placeholder="City, country" className="grow" /></div></label><label className="form-control"><span className="label-text mb-2 font-semibold">Bio</span><textarea value={form.bio} onChange={change("bio")} placeholder="What are you passionate about?" className="textarea textarea-bordered min-h-28" maxLength={240} /></label><div className="flex justify-end"><button className="btn btn-primary px-6" disabled={mutation.isPending}>{mutation.isPending ? <span className="loading loading-spinner loading-sm" /> : <><Save size={17} /> Save profile</>}</button></div></form></div></div></div></div>;
+}; export default ProfilePage;

@@ -33,6 +33,20 @@ export const completeOnboarding = async(userData)=>{
     return response.data;
 }
 
+export const getPosts = async()=> (await axiosInstance.get("/posts")).data.posts;
+export const uploadMedia = async(file)=>{
+    const formData=new FormData();
+    formData.append("media",file);
+    return (await axiosInstance.post("/posts/upload",formData)).data;
+}
+export const createPost = async(postData)=> (await axiosInstance.post("/posts",postData)).data.post;
+export const toggleLike = async(postId)=> (await axiosInstance.post(`/posts/${postId}/like`)).data;
+export const toggleSavePost = async(postId)=> (await axiosInstance.post(`/posts/${postId}/save`)).data;
+export const getSavedPosts = async()=> (await axiosInstance.get("/posts/saved")).data.posts;
+export const getPostComments = async(postId)=> (await axiosInstance.get(`/posts/${postId}/comments`)).data.comments;
+export const createComment = async({postId,content})=> (await axiosInstance.post(`/posts/${postId}/comments`,{content})).data.comment;
+export const updateProfile = async(profileData)=> (await axiosInstance.put("/users/profile",profileData)).data.user;
+
 export const getUserFriends = async()=>{
     const response=await axiosInstance.get("/users/friends");
     return response.data;
