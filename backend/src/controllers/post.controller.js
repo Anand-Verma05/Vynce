@@ -44,8 +44,13 @@ async function createPost(req,res){
 
 async function getPosts(req,res){
     try{
-        const posts=await Post.find().populate("author","fullName username profilePic").sort({createdAt:-1});
-        
+        const user=req.user;
+        const userIds=[...user.friends];
+
+        const posts=await Post.find({
+            author:{$in:userIds },
+        }).populate("author","fullName username profilePic").sort({createdAt:-1});
+
         res.status(200).json({
             success:true,
             posts

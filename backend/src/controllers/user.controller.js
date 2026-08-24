@@ -214,3 +214,111 @@ export async function getUserProfile(req,res){
         })
     }
 }
+
+export async function updateProfile(req,res){
+    try{
+        const userId=req.user.id;
+        const {fullName,bio,profilePic,location}=req.body;
+        const user=await User.findById(userId);
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            })
+        }
+
+        const updatedUser=await User.findByIdAndUpdate(userId,{fullName,bio,profilePic,location},{new:true,runValidators:true}).select("-password");
+
+        res.status(200).json({success:true,user:updatedUser})
+
+    }
+    catch(err){
+        console.log("Error in updateProfile controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+export async function removeFriend(req,res){
+    try{
+        const {id:friendId}=req.params;
+        const userId=req.user._id; // can ommit _ sice _ is the object other is string represnetations
+
+        if(userId.toString()==friendId){
+            return res.status(400).json({
+                message:"You cannot remove yourself"
+            })
+        }
+
+        const friend=await User.findById(friendId);
+        if(!friend){
+            return res.status(404).json({
+                message:"Friend not found"
+            })
+        }
+
+        const areFriends=req.user.friends.some((id)=>id.toString()==friendId);
+        if(!areFriends){
+            return res.status(400).json({
+                message:"You are not friends with this user"
+            })
+        }
+
+        await User.findByIdAndUpdate(userId,{
+            $pull:{friends:friendId}
+        })
+
+        await User.findByIdAndUpdate(friendId,{
+            $pull:{friends:userId}
+        })
+
+        res.status(200).json({success:true,message:"Friend removed"})
+
+
+    }
+    catch(err){
+        console.log("Error in removeFriend controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+
+export async function rejectFriendRequest(req,res){
+    try{
+        const {id:requestId}=req.params;
+
+        const friendReq=FriendRequest.findById(requestId);
+        if(!friendReq){
+            return res.status(404).json({
+                message:"Friend request not found"
+            })
+        }
+
+        if(friendReq.recipient.toString()!==req.user.id){
+            return res.status(403).json({
+                message:"You are not authorized to reject this friend request"
+            })
+        }
+
+        if(friendReq.status !== "pending"){
+            return res.status(400).json({
+                message:"Friend request is not pending"
+            })
+        }
+
+        await FriendRequest.findByIdAndDelete(requestId);
+
+        res.status(200).json({
+            success:true,
+            message:"Friend request rejected"
+        })  
+
+    }
+    catch(err){
+        console.log("Error in rejectFriendRequest controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
