@@ -10,6 +10,7 @@ import MyFriendsPage from './pages/MyFriendsPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import CreatePostPage from './pages/CreatePostPage.jsx'
 import SavedPostsPage from './pages/SavedPostsPage.jsx'
+import UserProfilePage from './pages/UserProfilePage.jsx'
 import { Toaster } from "react-hot-toast"
 import PageLoader from './components/PageLoader.jsx'
 import useAuthUser from './hooks/useAuthUser.js'
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/explore" element={isAuthenticated?<Layout showSidebar={true}><FriendsPage/></Layout>:<Navigate to="/login"/>}/>
           <Route path="/friends" element={isAuthenticated?<Layout showSidebar={true}><MyFriendsPage/></Layout>:<Navigate to="/login"/>}/>
           <Route path="/profile" element={isAuthenticated?<Layout showSidebar={true}><ProfilePage/></Layout>:<Navigate to="/login"/>}/>
+          <Route path="/profile/:username" element={isAuthenticated?<Layout showSidebar={true}><UserProfilePage/></Layout>:<Navigate to="/login"/>}/>
           <Route path="/create-post" element={isAuthenticated?<Layout showSidebar={true}><CreatePostPage/></Layout>:<Navigate to="/login"/>}/>
           <Route path="/saved-posts" element={isAuthenticated?<Layout showSidebar={true}><SavedPostsPage/></Layout>:<Navigate to="/login"/>}/>
 

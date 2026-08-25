@@ -43,6 +43,12 @@ export const createPost = async(postData)=> (await axiosInstance.post("/posts",p
 export const toggleLike = async(postId)=> (await axiosInstance.post(`/posts/${postId}/like`)).data;
 export const toggleSavePost = async(postId)=> (await axiosInstance.post(`/posts/${postId}/save`)).data;
 export const getSavedPosts = async()=> (await axiosInstance.get("/posts/saved")).data.posts;
+export const getUserPosts = async(userId)=> (await axiosInstance.get(`/posts/user/${userId}`)).data.posts;
+export const deletePost = async(postId)=> (await axiosInstance.delete(`/posts/${postId}`)).data;
+export const editPost = async({ postId, caption })=> (await axiosInstance.put(`/posts/${postId}`,{ caption })).data.post;
+export const editComment = async({ commentId, content })=> (await axiosInstance.put(`/posts/comments/${commentId}`,{ content })).data.comment;
+export const getUserProfile = async(username)=> (await axiosInstance.get(`/users/profile/${encodeURIComponent(username)}`)).data.user;
+export const removeFriend = async(friendId)=> (await axiosInstance.delete(`/users/friends/${friendId}`)).data;
 export const getPostComments = async(postId)=> (await axiosInstance.get(`/posts/${postId}/comments`)).data.comments;
 export const createComment = async({postId,content})=> (await axiosInstance.post(`/posts/${postId}/comments`,{content})).data.comment;
 export const updateProfile = async(profileData)=> (await axiosInstance.put("/users/profile",profileData)).data.user;

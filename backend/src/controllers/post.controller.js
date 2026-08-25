@@ -336,9 +336,13 @@ const getUserPosts= async(req,res)=>{
         const posts=await Post.find({
             author:userId
         }).populate("author","fullName username profilePic").sort({createdAt:-1});
+        const postsWithCommentCounts=await Promise.all(posts.map(async (post)=>({
+            ...post.toObject(),
+            commentsCount:await Comment.countDocuments({post:post._id})
+        })));
         res.status(200).json({
             success:true,
-            posts
+            posts:postsWithCommentCounts
         })
 
     }
@@ -394,4 +398,94 @@ const uploadMedia=async (req,res)=>{
     }
 }
 
-export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts,uploadMedia};
+
+const editcomment=async(req,res)=>{
+    try{
+        const {id:commentId}=req.params;
+        const {content}=req.body;
+        const userId=req.user._id;
+
+        if(!content || !content.trim()){
+            return res.status(400).json({
+                message:"Comment cannot be empty"
+            })
+        }
+        
+
+        const comment = await Comment.findById(commentId);
+
+        if(!comment){
+            return res.status(404).json({
+                message:"Comment not found"
+            })
+        }
+
+        if(comment.author.toString()!==userId.toString()){
+            return res.status(403).json({
+                message:"You are not authorized to edit this comment"
+            })
+        }
+        comment.content=content.trim();
+        await comment.save();
+
+        const updatedComment=await comment.populate("author","fullName username profilePic");
+
+        res.status(200).json({
+            success:true,
+            comment:updatedComment
+        })
+
+
+
+    }
+    catch(err){
+        console.log("Error in editComment controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+
+}
+
+
+const editPost=async(req,res)=>{
+    try{
+        const {id:postId}=req.params;
+        const {caption}=req.body;
+        const userId=req.user._id;
+
+        const post=await Post.findById(postId);
+
+        if(!post){
+            return res.status(404).json({
+                message:"Post not found"
+            })
+        }
+
+        if(post.author.toString()!==userId.toString()){
+            return res.status(403).json({
+                message:"You are not authorized to edit this post"
+            })
+        }
+
+        post.caption=caption? caption.trim():"";
+        await post.save();
+
+        const updatedPost=await post.populate("author","fullName username profilePic");
+
+        res.status(200).json({
+            success:true,
+            post:updatedPost
+        })
+
+
+
+    }
+    catch(err){
+        console.log("Error in editPost controller",err.message);
+        return res.status(500).json({
+            message:"Internal server error"
+        })
+    }
+}
+export {createPost,getPosts,toggleLike,toggleSavePost,getSavedPosts,createComment,getPostComments,deletePost,deleteCommnet,getUserPosts,uploadMedia,editcomment,editPost};

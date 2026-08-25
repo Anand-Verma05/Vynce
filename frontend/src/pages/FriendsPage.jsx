@@ -7,6 +7,7 @@ import {
   getRecommendedUsers,
   sendFriendRequest,
 } from "../lib/api";
+import { Link } from "react-router-dom";
 
 const FriendsPage = () => {
   const client = useQueryClient();
@@ -66,17 +67,17 @@ const FriendsPage = () => {
               >
                 <div className="card-body">
                   <div className="flex items-center gap-3">
-                    <div className="avatar">
+                    <Link to={`/profile/${encodeURIComponent(user.username)}`} className="avatar">
                       <div className="w-14 rounded-full">
                         <img src={user.profilePic || "/avatar.png"} alt="" />
                       </div>
-                    </div>
-                    <div>
+                    </Link>
+                    <Link to={`/profile/${encodeURIComponent(user.username)}`}>
                       <h2 className="font-bold">{user.fullName}</h2>
                       <p className="text-sm opacity-60">
                         @{user.username || "connecter"}
                       </p>
-                    </div>
+                    </Link>
                   </div>
                   {user.location && (
                     <p className="mt-3 flex items-center gap-1 text-xs opacity-60">

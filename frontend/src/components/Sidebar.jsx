@@ -61,7 +61,7 @@ const Sidebar = ({ mobileOpen = false, onClose = () => {} }) => {
             }`}
           >
             <UsersIcon className="size-5 text-base-content opacity-70" />
-            <span>My friends</span>
+            <span>Conversations</span>
         </Link>
 
           <Link
