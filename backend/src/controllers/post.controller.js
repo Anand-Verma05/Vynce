@@ -46,10 +46,11 @@ async function createPost(req,res){
 async function getPosts(req,res){
     try{
         const user=req.user;
-        const userIds=[...user.friends, user._id];
+        const allusers=await User.find({});
+        const userIds=[...user.friends, user._id,allusers];
 
         const posts=await Post.find({
-            author:{$in:userIds },
+           
         }).populate("author","fullName username profilePic").sort({createdAt:-1});
 
         const postsWithCommentCounts=await Promise.all(posts.map(async (post)=>{

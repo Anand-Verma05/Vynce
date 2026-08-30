@@ -7,10 +7,149 @@ import { createPost, uploadMedia } from "../lib/api";
 import useAuthUser from "../hooks/useAuthUser";
 
 const CreatePostPage = () => {
-  const { authUser } = useAuthUser(); const navigate = useNavigate(); const client = useQueryClient(); const inputRef = useRef(null);
-  const [caption, setCaption] = useState(""); const [file, setFile] = useState(null); const [preview, setPreview] = useState("");
-  const mutation = useMutation({ mutationFn: async () => { const media = await uploadMedia(file); return createPost({ caption: caption.trim(), mediaUrl: media.mediaUrl, mediaType: media.mediaType }); }, onSuccess: () => { client.invalidateQueries({ queryKey: ["posts"] }); toast.success("Your post is live!"); navigate("/"); }, onError: (e) => toast.error(e.response?.data?.message || "Could not publish post") });
-  const chooseFile = (e) => { const selected = e.target.files?.[0]; if (!selected) return; setFile(selected); setPreview(URL.createObjectURL(selected)); };
-  const clearFile = () => { setFile(null); setPreview(""); if (inputRef.current) inputRef.current.value = ""; };
-  return <div className="min-h-full w-full bg-base-200/40 px-4 py-6 sm:px-8"><div className="mx-auto w-full max-w-5xl"><Link to="/" className="btn btn-ghost btn-sm mb-5 gap-2"><ArrowLeft size={17} /> Back to feed</Link><div className="grid overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-xl lg:grid-cols-[1fr_0.8fr]"><div className="bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-6 sm:p-10"><div className="mb-8"><div className="mb-3 inline-flex rounded-full bg-primary/10 p-3 text-primary"><Sparkles /></div><h1 className="text-3xl font-black sm:text-4xl">Create something worth sharing.</h1><p className="mt-2 max-w-md opacity-65">Share a moment, start a conversation, or inspire your community.</p></div><div className="flex items-center gap-3"><div className="avatar"><div className="w-11 rounded-full"><img src={authUser?.profilePic || "/avatar.png"} alt="" /></div></div><div><p className="font-bold">{authUser?.fullName}</p><p className="text-sm opacity-60">@{authUser?.username || "connecter"}</p></div></div><textarea value={caption} onChange={(e) => setCaption(e.target.value)} maxLength={500} placeholder="Write a caption..." className="textarea textarea-bordered mt-6 min-h-36 w-full resize-none bg-base-100 text-base" /><div className="mt-2 text-right text-xs opacity-50">{caption.length}/500</div></div><div className="flex flex-col justify-center border-t border-base-300 p-6 sm:p-10 lg:border-l lg:border-t-0"><div onClick={() => inputRef.current?.click()} className="group flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/30 bg-base-200/50 p-5 text-center transition hover:border-primary hover:bg-primary/5">{preview ? <div className="relative w-full"><img src={preview} alt="Preview" className="max-h-72 w-full rounded-xl object-contain" />{file?.type.startsWith("video/") && <p className="mt-2 text-xs opacity-60">Video selected</p>}<button type="button" onClick={(e) => { e.stopPropagation(); clearFile(); }} className="btn btn-circle btn-sm absolute right-2 top-2"><X size={16} /></button></div> : <><div className="mb-4 rounded-full bg-primary/10 p-4 text-primary"><ImagePlus size={30} /></div><p className="font-bold">Choose a photo or video</p><p className="mt-1 text-sm opacity-60">PNG, JPG, GIF or MP4</p><span className="btn btn-primary btn-sm mt-5">Browse files</span></>}<input ref={inputRef} type="file" accept="image/*,video/*" onChange={chooseFile} className="hidden" /></div><button onClick={() => mutation.mutate()} disabled={!file || mutation.isPending} className="btn btn-primary mt-6 w-full">{mutation.isPending ? <span className="loading loading-spinner loading-sm" /> : <><Send size={17} /> Publish post</>}</button></div></div></div></div>;
-}; export default CreatePostPage;
+  const { authUser } = useAuthUser();
+  const navigate = useNavigate();
+  const client = useQueryClient();
+  const inputRef = useRef(null);
+  const [caption, setCaption] = useState("");
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const media = await uploadMedia(file);
+      return createPost({
+        caption: caption.trim(),
+        mediaUrl: media.mediaUrl,
+        mediaType: media.mediaType,
+      });
+    },
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["posts"] });
+      toast.success("Your post is live!");
+      navigate("/");
+    },
+    onError: (e) =>
+      toast.error(e.response?.data?.message || "Could not publish post"),
+  });
+  const chooseFile = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+  };
+  const clearFile = () => {
+    setFile(null);
+    setPreview("");
+    if (inputRef.current) inputRef.current.value = "";
+  };
+  return (
+    <div className="min-h-full w-full bg-base-200/40 px-4 py-6 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl">
+        <Link to="/" className="btn btn-ghost btn-sm mb-5 gap-2">
+          <ArrowLeft size={17} /> Back to feed
+        </Link>
+        <div className="grid overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-xl lg:grid-cols-[1fr_0.8fr]">
+          <div className="bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-6 sm:p-10">
+            <div className="mb-8">
+              <div className="mb-3 inline-flex rounded-full bg-primary/10 p-3 text-primary">
+                <Sparkles />
+              </div>
+              <h1 className="text-3xl font-black sm:text-4xl">
+                Create something worth sharing.
+              </h1>
+              <p className="mt-2 max-w-md opacity-65">
+                Share a moment, start a conversation, or inspire your community.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="avatar">
+                <div className="w-11 rounded-full">
+                  <img src={authUser?.profilePic || "/avatar.png"} alt="" />
+                </div>
+              </div>
+              <div>
+                <p className="font-bold">{authUser?.fullName}</p>
+                <p className="text-sm opacity-60">
+                  @{authUser?.username || "connecter"}
+                </p>
+              </div>
+            </div>
+            <textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              maxLength={500}
+              placeholder="Write a caption..."
+              className="textarea textarea-bordered mt-6 min-h-36 w-full resize-none bg-base-100 text-base"
+            />
+            <div className="mt-2 text-right text-xs opacity-50">
+              {caption.length}/500
+            </div>
+          </div>
+          <div className="flex flex-col justify-center border-t border-base-300 p-6 sm:p-10 lg:border-l lg:border-t-0">
+            <div
+              onClick={() => inputRef.current?.click()}
+              className="group flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/30 bg-base-200/50 p-5 text-center transition hover:border-primary hover:bg-primary/5"
+            >
+              {preview ? (
+                <div className="relative w-full">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="max-h-72 w-full rounded-xl object-contain"
+                  />
+                  {file?.type.startsWith("video/") && (
+                    <p className="mt-2 text-xs opacity-60">Video selected</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearFile();
+                    }}
+                    className="btn btn-circle btn-sm absolute right-2 top-2"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary">
+                    <ImagePlus size={30} />
+                  </div>
+                  <p className="font-bold">Choose a photo or video</p>
+                  <p className="mt-1 text-sm opacity-60">
+                    PNG, JPG, GIF or MP4
+                  </p>
+                  <span className="btn btn-primary btn-sm mt-5">
+                    Browse files
+                  </span>
+                </>
+              )}
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={chooseFile}
+                className="hidden"
+              />
+            </div>
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={!file || mutation.isPending}
+              className="btn btn-primary mt-6 w-full"
+            >
+              {mutation.isPending ? (
+                <span className="loading loading-spinner loading-sm" />
+              ) : (
+                <>
+                  <Send size={17} /> Publish post
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default CreatePostPage;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signup } from "../lib/api";
 const SignUpPage = () => {
@@ -10,11 +10,15 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
-  const quereyClient=useQueryClient();
-  const {mutate:signupMutation,isPending,error}=useMutation({
-    mutationFn:signup,
-    onSuccess:()=> quereyClient.invalidateQueries({queryKey:["authUser"]})
-  }) 
+  const quereyClient = useQueryClient();
+  const {
+    mutate: signupMutation,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: signup,
+    onSuccess: () => quereyClient.invalidateQueries({ queryKey: ["authUser"] }),
+  });
 
   const handleSignup = (e) => {
     e.preventDefault();
@@ -41,12 +45,12 @@ const SignUpPage = () => {
            */}
 
           {error && (
-            <div className='alert alert-error mb-4'>
+            <div className="alert alert-error mb-4">
               {/* console.log(error); */}
               <span>{error?.response?.data?.message || error?.message}</span>
             </div>
           )}
-            
+
           <div className="w-full">
             <form onSubmit={handleSignup}>
               <div className="space-y-4">
@@ -68,19 +72,41 @@ const SignUpPage = () => {
                       placeholder="Anand Verma"
                       className="input input-bordered w-full"
                       value={signupData.fullName}
-                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                      onChange={(e) =>
+                        setSignupData({
+                          ...signupData,
+                          fullName: e.target.value,
+                        })
+                      }
                       required
                     />
                   </div>
                   {/* USERNAME */}
                   <div className="form-control w-full">
-                    <label className="label"><span className="label-text">Username</span></label>
+                    <label className="label">
+                      <span className="label-text">Username</span>
+                    </label>
                     <label className="input input-bordered flex items-center gap-2">
                       <span className="opacity-50">@</span>
-                      <input type="text" placeholder="yourname" className="grow" value={signupData.username} onChange={(e) => setSignupData({ ...signupData, username: e.target.value.toLowerCase().replace(/\s/g, "") })} required minLength={3} />
+                      <input
+                        type="text"
+                        placeholder="yourname"
+                        className="grow"
+                        value={signupData.username}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            username: e.target.value
+                              .toLowerCase()
+                              .replace(/\s/g, ""),
+                          })
+                        }
+                        required
+                        minLength={3}
+                      />
                     </label>
                   </div>
-                    {/* EMAIL */}
+                  {/* EMAIL */}
                   <div className="form-control w-full">
                     <label className="label">
                       <span className="label-text">Email</span>
@@ -90,7 +116,9 @@ const SignUpPage = () => {
                       placeholder="anand@gmail.com"
                       className="input input-bordered w-full"
                       value={signupData.email}
-                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                      onChange={(e) =>
+                        setSignupData({ ...signupData, email: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -104,7 +132,12 @@ const SignUpPage = () => {
                       placeholder="At least 6 characters"
                       className="input input-bordered w-full"
                       value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                      onChange={(e) =>
+                        setSignupData({
+                          ...signupData,
+                          password: e.target.value,
+                        })
+                      }
                       required
                       minLength={6}
                     />
@@ -113,22 +146,27 @@ const SignUpPage = () => {
                     </p>
                   </div>
 
-                                    <div className="form-control">
+                  <div className="form-control">
                     <label className="label cursor-pointer justify-start gap-2">
-                      <input type="checkbox" className="checkbox checkbox-sm" required />
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-sm"
+                        required
+                      />
                       <span className="text-xs leading-tight">
                         I agree to the{" "}
-                        <span className="text-primary hover:underline">terms of service</span> and{" "}
-                        <span className="text-primary hover:underline">privacy policy</span>
+                        <span className="text-primary hover:underline">
+                          terms of service
+                        </span>{" "}
+                        and{" "}
+                        <span className="text-primary hover:underline">
+                          privacy policy
+                        </span>
                       </span>
                     </label>
                   </div>
-
-                   
-
-
                 </div>
-                
+
                 <button className="btn btn-primary w-full" type="submit">
                   {isPending ? (
                     <>
@@ -137,9 +175,9 @@ const SignUpPage = () => {
                     </>
                   ) : (
                     "Create Account"
-                   )} 
+                  )}
                 </button>
-                  <div className="text-center mt-4">
+                <div className="text-center mt-4">
                   <p className="text-sm">
                     Already have an account?{" "}
                     <Link to="/login" className="text-primary hover:underline">
@@ -147,23 +185,29 @@ const SignUpPage = () => {
                     </Link>
                   </p>
                 </div>
-
               </div>
             </form>
           </div>
         </div>
-       {/* right sise */}
-          <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
+        {/* right sise */}
+        <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
           <div className="max-w-md p-8">
             {/* Illustration */}
             <div className="relative aspect-square max-w-sm mx-auto">
-              <img src="/Chat-amico.png" alt="Language connection illustration" className="w-full h-full" />
+              <img
+                src="/Chat-amico.png"
+                alt="Language connection illustration"
+                className="w-full h-full"
+              />
             </div>
 
             <div className="text-center space-y-3 mt-6">
-              <h2 className="text-xl font-semibold">Connect with language partners worldwide</h2>
+              <h2 className="text-xl font-semibold">
+                Connect with language partners worldwide
+              </h2>
               <p className="opacity-70">
-                Practice conversations, make friends, and improve your language skills together
+                Practice conversations, make friends, and improve your language
+                skills together
               </p>
             </div>
           </div>

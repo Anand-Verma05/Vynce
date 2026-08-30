@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import useAuthUser from '../hooks/useAuthUser'
-import { useQuery } from '@tanstack/react-query'
-import { getStreamToken } from '../lib/api'
-import { toast } from 'react-hot-toast'
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import useAuthUser from "../hooks/useAuthUser";
+import { useQuery } from "@tanstack/react-query";
+import { getStreamToken } from "../lib/api";
+import { toast } from "react-hot-toast";
 import {
   StreamVideo,
   StreamVideoClient,
@@ -12,73 +12,66 @@ import {
   SpeakerLayout,
   StreamTheme,
   CallingState,
-  useCallStateHooks
-} from "@stream-io/video-react-sdk"
+  useCallStateHooks,
+} from "@stream-io/video-react-sdk";
 // import { useThemeStore } from '../store/useThemeStore'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import PageLoader from '../components/PageLoader'
+import PageLoader from "../components/PageLoader";
 
-const STREAM_API_KEY= import.meta.env.VITE_STREAM_API_KEY
+const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 const CallPage = () => {
-  const {id:callId}=useParams();
-  const [client,setClient]=useState(null);
-  const [call,setCall]=useState(null);
-  const [isConnecting,setIsConnecting]=useState(true);
-  const {authUser,isLoading}=useAuthUser();
+  const { id: callId } = useParams();
+  const [client, setClient] = useState(null);
+  const [call, setCall] = useState(null);
+  const [isConnecting, setIsConnecting] = useState(true);
+  const { authUser, isLoading } = useAuthUser();
 
-  const {data:tokenData}=useQuery({
-    queryKey:["streamToken"],
-    queryFn:getStreamToken,
-    enabled:!!authUser //jab authuser will be avaliable
+  const { data: tokenData } = useQuery({
+    queryKey: ["streamToken"],
+    queryFn: getStreamToken,
+    enabled: !!authUser, //jab authuser will be avaliable
+  });
 
-  })
+  useEffect(() => {
+    const initCall = async () => {
+      if (!tokenData.token || !authUser || !callId) return;
 
-  useEffect(()=>{
-    const initCall=async ()=>{
-        if(!tokenData.token || !authUser || !callId)return ;
+      try {
+        console.log("initailizeind video calll");
 
-        try {
-            console.log("initailizeind video calll");
+        const user = {
+          id: authUser._id,
+          name: authUser.fullName,
+          image: authUser.profilePic,
+        };
 
-            const user={
-              id:authUser._id,
-              name:authUser.fullName,
-              image:authUser.profilePic
-            }
+        const videoClient = new StreamVideoClient({
+          apiKey: STREAM_API_KEY,
+          user,
+          token: tokenData.token,
+        });
 
-            const videoClient= new StreamVideoClient({
-              apiKey:STREAM_API_KEY,
-              user,
-              token:tokenData.token
-            })
+        const callInstance = videoClient.call("default", callId);
 
-            const callInstance=videoClient.call("default",callId);
+        await callInstance.join({ create: true });
 
-            await callInstance.join({create:true});
+        console.log("joined call successfully");
 
-            console.log("joined call successfully");
-
-            setClient(videoClient);
-            setCall(callInstance);
-
-
-
-        } catch (error) {
-            console.error("Error joining the call",error.message);
-            toast.error("could not joint the call")
-
-
-        }finally{
-          setIsConnecting(false);
-        }
-
-    }
+        setClient(videoClient);
+        setCall(callInstance);
+      } catch (error) {
+        console.error("Error joining the call", error.message);
+        toast.error("could not joint the call");
+      } finally {
+        setIsConnecting(false);
+      }
+    };
     initCall();
-  },[tokenData,authUser,callId])
+  }, [tokenData, authUser, callId]);
 
-  if(isLoading || isConnecting )return <PageLoader/>
+  if (isLoading || isConnecting) return <PageLoader />;
 
   return (
     <div className="h-screen flex flex-col items-center justify-center">
@@ -96,8 +89,8 @@ const CallPage = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const CallContent = () => {
   const { useCallCallingState } = useCallStateHooks();
@@ -115,6 +108,4 @@ const CallContent = () => {
   );
 };
 
-export default CallPage
-
-
+export default CallPage;

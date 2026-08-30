@@ -67,7 +67,10 @@ const FriendsPage = () => {
               >
                 <div className="card-body">
                   <div className="flex items-center gap-3">
-                    <Link to={`/profile/${encodeURIComponent(user.username)}`} className="avatar">
+                    <Link
+                      to={`/profile/${encodeURIComponent(user.username)}`}
+                      className="avatar"
+                    >
                       <div className="w-14 rounded-full">
                         <img src={user.profilePic || "/avatar.png"} alt="" />
                       </div>
