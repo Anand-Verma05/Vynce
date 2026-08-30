@@ -34,12 +34,7 @@ app.use("/api/chat",chatRoutes);
 app.use("/api/posts",postRoutes);
 
 
-if(process.env.NODE_ENV==="production"){
-    app.use(express.static(path.join(__directoryname,"../frontend/dist")));
-    app.get("*",(req,res)=>{
-        res.sendFile(path.resolve(__directoryname,"../frontend/dist/index.html"));
-    })
-}
+
 
 app.listen(PORT,()=>{
     console.log(`server is running on port ${PORT}`);
