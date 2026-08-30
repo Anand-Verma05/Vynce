@@ -1,4 +1,4 @@
-```jsx
+
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
@@ -157,4 +157,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-```
+
