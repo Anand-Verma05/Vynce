@@ -288,7 +288,7 @@ GET    /api/chat/token
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Anand-Verma05/Connect.git
+git clone https://github.com/Anand-Verma05/Vynce.git
 cd Connect
 ```
 
