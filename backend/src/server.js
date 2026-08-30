@@ -13,7 +13,7 @@ import connectDB from "./lib/db.js";
 import postRoutes from "./routes/post.route.js";
 const app=express();
 
-const PORT=process.env.PORT;
+const PORT=process.env.PORT || 5000;
 const __directoryname=path.resolve();
 
 
@@ -22,7 +22,7 @@ const __directoryname=path.resolve();
     next();
 });
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials:true
 }))
 app.use(express.json());
