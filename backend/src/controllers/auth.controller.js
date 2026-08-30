@@ -32,7 +32,7 @@ export async function signup(req,res){
 
             const idx=Math.floor(Math.random()*100)+1;
 
-            const randomAvator=`https://i.pravatar.cc/150?img=idx`
+            const randomAvator=`https://i.pravatar.cc/150?img=${idx}`
 
             const salt=await bcrypt.genSalt(10);
             const hashedPassword=await bcrypt.hash(password,salt);
@@ -64,12 +64,12 @@ export async function signup(req,res){
 
             const token=jwt.sign({userId:newUser._id}, process.env.JWT_SECRET, {expiresIn:"7d"});
 
-            res.cookie("jwt",token,{
-                maxAge:7*24 * 60 * 60 *1000,
-                httpOnly:true,//prevernts xxs atac
-                sameSite:"strict",
-                secure:process.env.NODE_ENV==="production"
-            })
+            res.cookie("jwt", token, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "none",
+    secure: true
+});
             res.status(201).json({success:true,user:newUser});
 
         }catch(err){
@@ -109,12 +109,12 @@ export async function login(req,res){
 
          const token=jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn:"7d"});
 
-            res.cookie("jwt",token,{
-                maxAge:7*24 * 60 * 60 *1000,
-                httpOnly:true,//prevernts xxs atac
-                sameSite:"strict",
-                secure:process.env.NODE_ENV==="production"
-            })
+           res.cookie("jwt", token, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "none",
+    secure: true
+});
 
             res.status(200).json({
                 success:true,
